@@ -1,3 +1,4 @@
+import { theme } from 'sveltewind';
 import { sveltewind } from 'sveltewind/themes';
 
 const abtlThemeReplacementMap = new Map([
@@ -26,8 +27,12 @@ const abtlTheme = Object.keys(sveltewind).reduce((obj: { [key: string]: string }
 	return obj;
 }, {});
 
-abtlTheme['button-delete'] = 'bg-red-500 hover:bg-red-600 focus:bg-red-600 focus:ring-red-500/30';
-abtlTheme['button-icon'] = 'px-3';
-abtlTheme.tr = 'dark:even:bg-white/5';
+theme.set(abtlTheme);
+theme.update({
+	'button-delete': 'bg-red-500 hover:bg-red-600 focus:bg-red-600 focus:ring-red-500/30',
+	'button-icon': 'px-3',
+	nav: 'flex-row',
+	tr: 'dark:even:bg-white/5'
+});
 
 export { abtlTheme };
