@@ -14,15 +14,14 @@ datasource db {
 }
 
 model User {
-  id                     String                @id @default(auto()) @map("_id") @db.ObjectId
-  customerInteractionIds String[]              @db.ObjectId
-  customerInteractions   CustomerInteraction[]
-  isActive               Boolean               @default(false)
-  isOnboarded            Boolean               @default(false)
+  id                     String       @id @default(auto()) @map("_id") @db.ObjectId
+  customerInteractionIds String[]     @db.ObjectId
+  isActive               Boolean      @default(false)
+  isOnboarded            Boolean      @default(false)
   passwordHash           String
-  profileId              String?               @db.ObjectId
+  profileId              String?      @db.ObjectId
   profile                UserProfile?
-  username               String                @unique
+  username               String       @unique
 }
 
 model UserProfile {
