@@ -2,14 +2,17 @@
 	"name": "abtl-pcrs",
 	"version": "0.0.2",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "npm run prisma:generate && npm run prisma:db:push && vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"release": "standard-version"
+		"release": "standard-version",
+		"prisma:generate": "prisma generate",
+		"prisma:db:push": "npx prisma db push",
+		"postinstall": "npm run prisma:generate"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
