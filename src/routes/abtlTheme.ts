@@ -18,13 +18,16 @@ const abtlThemeReplacementMap = new Map([
 	['shadow-violet-500', 'shadow-primary-500']
 ]);
 
-export const abtlTheme = Object.keys(sveltewind).reduce(
-	(obj: { [key: string]: string }, key: string) => {
-		obj[key] = sveltewind[key].replace(
-			new RegExp([...abtlThemeReplacementMap].map(([search]) => search).join('|'), 'g'),
-			(match: string) => abtlThemeReplacementMap.get(match)
-		);
-		return obj;
-	},
-	{}
-);
+const abtlTheme = Object.keys(sveltewind).reduce((obj: { [key: string]: string }, key: string) => {
+	obj[key] = sveltewind[key].replace(
+		new RegExp([...abtlThemeReplacementMap].map(([search]) => search).join('|'), 'g'),
+		(match: string) => abtlThemeReplacementMap.get(match)
+	);
+	return obj;
+}, {});
+
+abtlTheme['button-delete'] = 'bg-red-500 hover:bg-red-600 focus:bg-red-600 focus:ring-red-500/30';
+abtlTheme['button-icon'] = 'px-3';
+abtlTheme.tr = 'dark:even:bg-white/5';
+
+export { abtlTheme };
