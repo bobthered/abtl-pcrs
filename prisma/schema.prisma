@@ -12,3 +12,28 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id                     String                @id @default(auto()) @map("_id") @db.ObjectId
+  customerInteractionIds String[]              @db.ObjectId
+  customerInteractions   CustomerInteraction[]
+  isActive               Boolean               @default(false)
+  isOnboarded            Boolean               @default(false)
+  passwordHash           String
+  profileId              String?               @db.ObjectId
+  profile                UserProfile?
+  username               String                @unique
+}
+
+model UserProfile {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  dateHired           DateTime
+  ennisId             Int
+  email               String
+  emailSignatureTitle String
+  extension           Int
+  firstName           String
+  lastName            String
+  userId              String   @unique @db.ObjectId
+  user                User     @relation(fields: [userId], references: [id])
+}
