@@ -1,9 +1,14 @@
-<script>
+<script lang="ts">
 	import { theme } from 'sveltewind';
-	import { sveltewind } from 'sveltewind/themes';
+	import { abtlTheme } from './abtlTheme';
 	import '../app.css';
 
-	theme.set(sveltewind);
+	// props
+	let { children } = $props();
+
+	theme.set(abtlTheme);
 </script>
 
-<slot></slot>
+{#if children}
+	{@render children()}
+{/if}
