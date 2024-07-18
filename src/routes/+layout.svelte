@@ -7,7 +7,8 @@
 	let { children } = $props();
 	const navMap = new Map([
 		['/job-classifications', 'Job Classifications'],
-		['/pcrs', 'PCRs']
+		['/pcrs', 'PCRs'],
+		['/users', 'Users']
 	]);
 </script>
 
