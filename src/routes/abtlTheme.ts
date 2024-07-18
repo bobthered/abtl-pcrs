@@ -31,6 +31,8 @@ theme.set(abtlTheme);
 theme.update({
 	'button-delete': 'bg-red-500 hover:bg-red-600 focus:bg-red-600 focus:ring-red-500/30',
 	'button-icon': 'px-3',
+	'button-ghost':
+		'text-current bg-transparent hover:bg-slate-950/10 focus:bg-slate-950/10 focus:ring-slate-950/30 hover:bg-slate-50/10 focus:bg-slate-50/10 focus:ring-slate-50/30',
 	nav: 'flex-row',
 	tr: 'dark:even:bg-white/5'
 });
