@@ -17,10 +17,5 @@
 </script>
 
 <Div class="flex flex-grow flex-col overflow-auto p-4">
-	<DataTable
-		bind:columnFilterKeys
-		bind:columnTypes
-		bind:rows={data.jobClassifications}
-		sortKey="costCenter"
-	/>
+	<DataTable bind:columnFilterKeys bind:columnTypes bind:rows={data.jobClassifications} />
 </Div>

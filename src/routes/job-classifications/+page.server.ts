@@ -55,7 +55,7 @@ export const actions: Actions = {
 };
 
 export const load = async () => {
-	const jobClassifications = await prisma.jobClassification.findMany();
+	const jobClassifications = await _getJobClassifications();
 
 	return { jobClassifications };
 };
