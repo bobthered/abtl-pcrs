@@ -2,5 +2,15 @@
 	"Better import": {
 		"prefix": "@import",
 		"body": ["import { $2 } from '$1';"]
+	},
+	"DataTable Server Functions": {
+		"prefix": "@dataTableServerFunctions",
+		"body": [
+			"import { server } from '\\$lib/dataTable';",
+			"",
+			"const { actions, load } = await server('$1');",
+			"",
+			"export { actions, load };"
+		]
 	}
 }
