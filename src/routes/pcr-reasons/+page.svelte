@@ -3,7 +3,7 @@
 
 	// props
 	let { data } = $props();
-	let columnsToHide = $state(['id']);
+	let columnsToHide = $state(['id', 'pcrIDs', 'pcrs']);
 	let sortKey = $state('description');
 </script>
 
