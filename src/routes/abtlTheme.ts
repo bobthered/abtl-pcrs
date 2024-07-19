@@ -33,7 +33,10 @@ theme.update({
 	'button-icon': 'px-3',
 	'button-ghost':
 		'text-current bg-transparent hover:bg-slate-950/10 focus:bg-slate-950/10 focus:ring-slate-950/30 hover:bg-slate-50/10 focus:bg-slate-50/10 focus:ring-slate-50/30',
+	modal: 'z-[1]',
 	nav: 'flex-row',
+	overlay: 'z-[1]',
+	th: 'z-[1]',
 	tr: 'dark:even:bg-white/5'
 });
 
