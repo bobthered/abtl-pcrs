@@ -26,6 +26,7 @@
 
 	// types
 	type Props = {
+		columnOrder?: string[];
 		columns?: string[];
 		columnsToHide?: string[];
 		createModalClose?: () => void;
@@ -83,6 +84,7 @@
 
 	// props
 	let {
+		columnOrder = $bindable(),
 		columns = $bindable(),
 		columnsToHide = $bindable(),
 		createModalClose = $bindable(),
@@ -109,7 +111,19 @@
 
 	// effects
 	$effect(() => {
-		if (columns === undefined) columns = fields.map(({ name }) => name);
+		if (columnOrder === undefined) columnOrder = [];
+		if (columns === undefined)
+			columns = fields
+				.map(({ name }) => name)
+				.sort((a: string, b: string) => {
+					if (!columnOrder) return 0;
+					const aValue = columnOrder?.indexOf(a);
+					const bValue = columnOrder?.indexOf(b);
+					if (aValue === -1 && bValue === -1) return 0;
+					if (aValue === -1) return 1;
+					if (bValue === -1) return -1;
+					return aValue - bValue;
+				});
 		if (columnsToHide === undefined) columnsToHide = ['id'];
 		if (createModalData === undefined) createModalData = {};
 		if (isSortable === undefined) isSortable = true;
