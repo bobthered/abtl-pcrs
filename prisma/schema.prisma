@@ -18,12 +18,43 @@ model JobClassification {
   description       String   @unique
   costCenter        Int
   code              Int
-  facility          Int      @default(2046)
   eeoClassification Int
+  facility          Int      @default(2046)
+  pcrIds            String[] @db.ObjectId
+  pcrs              PCR[]
   title             String
   userIds           String[] @db.ObjectId
   users             User[]
   workCompClass     Int
+}
+
+model PCR {
+  id                  String            @id @default(auto()) @map("_id") @db.ObjectId
+  after               Float
+  // costCenter          Int?
+  date                DateTime
+  // eeoClassification   Int?
+  explanation         String
+  facility            Int               @default(2046)
+  jobClassificationId String            @db.ObjectId
+  jobClassification   JobClassification @relation(fields: [jobClassificationId], references: [id])
+  previous            Float
+  previousPCRIds      String[]          @db.ObjectId
+  previousPCRs        PCR[]             @relation("PCR Relation")
+  newPCR              PCR?              @relation("PCR Relation", fields: [previousPCRIds], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reasonId            String            @db.ObjectId
+  reason              PCRReason         @relation(fields: [reasonId], references: [id])
+  // title               String?
+  userId              String?           @db.ObjectId
+  user                User?             @relation(fields: [userId], references: [id])
+}
+
+model PCRReason {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  code        Int      @unique
+  description String   @unique
+  pcrIDs      String[] @db.ObjectId
+  pcrs        PCR[]
 }
 
 model User {
@@ -33,6 +64,8 @@ model User {
   jobClassificationId String?            @db.ObjectId
   jobClassification   JobClassification? @relation(fields: [jobClassificationId], references: [id])
   passwordHash        String
+  pcrIds              String[]           @db.ObjectId
+  pcrs                PCR[]
   profileId           String?            @db.ObjectId
   profile             UserProfile?
   username            String             @unique
