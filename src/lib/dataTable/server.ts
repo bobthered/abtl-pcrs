@@ -174,6 +174,7 @@ const server = async (modelName: string, options?: Options) => {
 			if (field?.type === 'Boolean') obj[key] = obj[key] === 'true';
 			if (field?.type === 'DateTime')
 				obj[key] = DateTime.fromFormat(obj[key], 'yyyy-MM-dd').toJSDate();
+			if (field?.type === 'Float') obj[key] = parseFloat(obj[key]);
 			if (field?.type === 'Int') obj[key] = +obj[key];
 
 			return obj;
