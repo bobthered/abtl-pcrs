@@ -8,7 +8,7 @@ const { actions, load } = await server('PCR', {
 		},
 		reasonId: {
 			modelName: 'PCRReason',
-			label: (data) => `${data.code} - ${data.description}`
+			label: 'description'
 		},
 		userId: {
 			modelName: 'User',

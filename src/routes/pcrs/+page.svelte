@@ -3,6 +3,15 @@
 
 	// props
 	let { data } = $props();
+	let columnOrder = $state([
+		'userId',
+		'jobClassificationId',
+		'date',
+		'previous',
+		'after',
+		'reasonId',
+		'explanation'
+	]);
 	let columnsToHide = $state([
 		'id',
 		'facility',
@@ -19,6 +28,7 @@
 
 <Div class="flex flex-grow flex-col overflow-auto p-4">
 	<DataTable
+		bind:columnOrder
 		bind:columnsToHide
 		bind:fields={data.fields}
 		bind:relationOptions={data.relationOptions}
