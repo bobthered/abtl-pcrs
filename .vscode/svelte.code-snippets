@@ -1,0 +1,25 @@
+{
+	"DataTable Page": {
+		"prefix": "@dataTablePage",
+		"body": [
+			"<script lang=\"ts\">",
+			"\timport { DataTable, Div } from '\\$lib/components';",
+			"",
+			"\t// props",
+			"\tlet { data } = \\$props();",
+			"\tlet columnsToHide = \\$state([${1:'id'}]);",
+			"\tlet sortKey = \\$state(${2:'description'});",
+			"</script>",
+			"",
+			"<Div class=\"flex flex-grow flex-col overflow-auto p-4\">",
+			"\t<DataTable",
+			"\t\tbind:columnsToHide",
+			"\t\tbind:fields={data.fields}",
+			"\t\tbind:relationOptions={data.relationOptions}",
+			"\t\tbind:rows={data.rows}",
+			"\t\tbind:sortKey",
+			"\t/>",
+			"</Div>"
+		]
+	}
+}
