@@ -19,7 +19,7 @@
 	} from '$lib/components';
 	import type { Fields } from '$lib/dataTable/server';
 	import * as format from '$lib/format';
-	import { ChevronDown, Plus, Trash, TriangleAlert } from 'lucide-svelte';
+	import { ChevronDown, Plus, RefreshCcw, Trash, TriangleAlert } from 'lucide-svelte';
 	import type { Snippet } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { twMerge } from 'tailwind-merge';
@@ -142,7 +142,16 @@
 </script>
 
 <Card class="overflow-auto p-0">
-	<Card class="flex flex-row items-center justify-end rounded-none p-4">
+	<Card class="flex flex-row items-center justify-end space-x-2 rounded-none p-4">
+		<Button
+			class="p-2"
+			onclick={() => {
+				invalidateAll();
+			}}
+			variant="icon"
+		>
+			<RefreshCcw class="h-4 w-4" />
+		</Button>
 		<Button
 			class="p-2"
 			onclick={() => {
@@ -234,7 +243,7 @@
 										<Input
 											bind:value={rowData[columnKey]}
 											class={twMerge('w-[18rem] rounded-none')}
-											onchange={() => update(rowData, columnKey)}
+											onblur={() => update(rowData, columnKey)}
 										/>
 									{:else if column.type === 'Boolean'}
 										<Checkbox
@@ -245,28 +254,28 @@
 										<Input
 											bind:value={rowData[columnKey]}
 											class={twMerge('w-[10rem] rounded-none text-right')}
-											onchange={() => update(rowData, columnKey)}
+											onblur={() => update(rowData, columnKey)}
 											type="date"
 										/>
 									{:else if column.type === 'Float'}
 										<Input
 											bind:value={rowData[columnKey]}
 											class={twMerge('w-[10rem] rounded-none text-right')}
-											onchange={() => update(rowData, columnKey)}
+											onblur={() => update(rowData, columnKey)}
 											type="number"
 										/>
 									{:else if column.type === 'Int'}
 										<Input
 											bind:value={rowData[columnKey]}
 											class={twMerge('w-[10rem] rounded-none text-right')}
-											onchange={() => update(rowData, columnKey)}
+											onblur={() => update(rowData, columnKey)}
 											type="number"
 										/>
 									{:else if column.type === 'String'}
 										<Input
 											bind:value={rowData[columnKey]}
 											class={twMerge('rounded-none')}
-											onchange={() => update(rowData, columnKey)}
+											onblur={() => update(rowData, columnKey)}
 										/>
 									{/if}
 								</Td>
