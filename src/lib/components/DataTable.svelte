@@ -19,7 +19,18 @@
 	} from '$lib/components';
 	import type { Fields } from '$lib/dataTable/server';
 	import * as format from '$lib/format';
-	import { ChevronDown, Plus, RefreshCcw, Trash, TriangleAlert } from 'lucide-svelte';
+	import {
+		ChevronDown,
+		ChevronFirst,
+		ChevronLast,
+		ChevronLeft,
+		ChevronRight,
+		Plus,
+		RefreshCcw,
+		Settings,
+		Trash,
+		TriangleAlert
+	} from 'lucide-svelte';
 	import type { Snippet } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { twMerge } from 'tailwind-merge';
@@ -35,6 +46,7 @@
 		createModalIsVisible?: boolean;
 		createModalOpen?: () => void;
 		createModalToggle?: () => void;
+		currentPage?: number;
 		deleteModalClose?: () => void;
 		deleteModalData?: { [key: string]: any };
 		deleteModalIsVisible?: boolean;
@@ -43,9 +55,15 @@
 		fields: Fields;
 		header?: Snippet;
 		isSortable?: boolean;
+		numberOfPages?: number;
+		numberOfRowsPerPage?: number;
 		relationOptions?: { [key: string]: { label: any; value: string }[] };
 		row?: Snippet;
 		rows: any[];
+		settingsModalClose?: () => void;
+		settingsModalIsVisible?: boolean;
+		settingsModalOpen?: () => void;
+		settingsModalToggle?: () => void;
 		sortDirection?: -1 | 1;
 		sortFn?: (a: any, b: any) => number;
 		sortKey?: string;
@@ -59,7 +77,7 @@
 			}
 			if (result.type === 'success') {
 				createModalData = {};
-				createModalClose();
+				if (createModalClose) createModalClose();
 			}
 			await invalidateAll();
 		};
@@ -67,7 +85,7 @@
 	const deleteModalEnhanceHandler = () => {
 		return async ({ result }: { result: any }) => {
 			if (result.type === 'success') {
-				deleteModalClose();
+				if (deleteModalClose) deleteModalClose();
 			}
 			await invalidateAll();
 		};
@@ -93,6 +111,7 @@
 		createModalIsVisible = $bindable(),
 		createModalOpen = $bindable(),
 		createModalToggle = $bindable(),
+		currentPage = $bindable(),
 		deleteModalClose = $bindable(),
 		deleteModalData = $bindable(),
 		deleteModalIsVisible = $bindable(),
@@ -101,9 +120,15 @@
 		fields = $bindable(),
 		header,
 		isSortable = $bindable(),
+		numberOfPages = $bindable(),
+		numberOfRowsPerPage = $bindable(),
 		relationOptions = $bindable(),
 		row,
 		rows = $bindable(),
+		settingsModalClose = $bindable(),
+		settingsModalIsVisible = $bindable(),
+		settingsModalOpen = $bindable(),
+		settingsModalToggle = $bindable(),
 		sortDirection = $bindable(),
 		sortFn = $bindable(),
 		sortKey = $bindable()
@@ -126,7 +151,9 @@
 				});
 		if (columnsToHide === undefined) columnsToHide = ['id'];
 		if (createModalData === undefined) createModalData = {};
+		if (currentPage === undefined) currentPage = 0;
 		if (isSortable === undefined) isSortable = true;
+		if (numberOfRowsPerPage === undefined) numberOfRowsPerPage = 10;
 		if (relationOptions === undefined) relationOptions = {};
 		if (rows === undefined) rows = [];
 		if (sortDirection === undefined) sortDirection = 1;
@@ -153,9 +180,15 @@
 		if (sortKey === undefined)
 			sortKey = columns.filter((columnKey) => !columnsToHide.includes(columnKey))[0];
 	});
+	$effect(() => {
+		if (numberOfRowsPerPage !== undefined && rows !== undefined) {
+			numberOfRowsPerPage = +numberOfRowsPerPage;
+			numberOfPages = Math.ceil(rows.length / numberOfRowsPerPage);
+		}
+	});
 </script>
 
-<Card class="overflow-auto p-0">
+<Card class="flex-grow overflow-auto p-0">
 	<Card class="flex flex-row items-center justify-end space-x-2 rounded-none p-4">
 		<Button
 			class="p-2"
@@ -166,11 +199,14 @@
 		>
 			<RefreshCcw class="h-4 w-4" />
 		</Button>
+		<Button class="p-2" onclick={settingsModalOpen} variant="icon">
+			<Settings class="h-4 w-4" />
+		</Button>
 		<Button
 			class="p-2"
 			onclick={() => {
 				createModalErrorMessage = undefined;
-				createModalOpen();
+				if (createModalOpen) createModalOpen();
 			}}
 			variant="icon"
 		>
@@ -224,7 +260,9 @@
 				{/if}
 			</Thead>
 			<Tbody>
-				{#each rows.sort(sortFn) as rowData}
+				{#each rows
+					.sort(sortFn)
+					.filter((_, i) => i >= (currentPage || 0) * (numberOfRowsPerPage || 10) && i < ((currentPage || 0) + 1) * (numberOfRowsPerPage || 10)) as rowData}
 					<Tr>
 						{#if row}
 							{@render row(rowData)}
@@ -305,6 +343,43 @@
 				{/each}
 			</Tbody>
 		</Table>
+	</Card>
+	<Card class="flex flex-row items-center justify-center space-x-2 rounded-none p-4">
+		<Button
+			class="p-2"
+			disabled={currentPage < 1 ? 'disabled' : undefined}
+			onclick={() => (currentPage = 0)}
+		>
+			<ChevronFirst class="h-4 w-4" />
+		</Button>
+		<Button
+			class="p-2"
+			disabled={currentPage < 1 ? 'disabled' : undefined}
+			onclick={() => (currentPage = currentPage - 1)}
+		>
+			<ChevronLeft class="h-4 w-4" />
+		</Button>
+		<Select
+			bind:value={currentPage}
+			options={[...Array(numberOfPages)].map((_, i) => ({
+				label: `${i * numberOfRowsPerPage + 1} - ${Math.min((i + 1) * numberOfRowsPerPage, rows.length)}`,
+				value: i
+			}))}
+		/>
+		<Button
+			class="p-2"
+			disabled={currentPage >= numberOfPages - 1 ? 'disabled' : undefined}
+			onclick={() => (currentPage = currentPage + 1)}
+		>
+			<ChevronRight class="h-4 w-4" />
+		</Button>
+		<Button
+			class="p-2"
+			disabled={currentPage >= numberOfPages - 1 ? 'disabled' : undefined}
+			onclick={() => (currentPage = numberOfPages - 1)}
+		>
+			<ChevronLast class="h-4 w-4" />
+		</Button>
 	</Card>
 </Card>
 
@@ -410,4 +485,21 @@
 		</Div>
 		<Input bind:value={deleteModalData.id} name="id" type="hidden" />
 	</form>
+</Modal>
+
+<Modal
+	bind:close={settingsModalClose}
+	bind:isVisible={settingsModalIsVisible}
+	bind:open={settingsModalOpen}
+	bind:toggle={settingsModalToggle}
+>
+	<Div class="flex flex-col space-y-6">
+		<Div class="grid grid-cols-[fit-content(0px)_1fr] items-center gap-x-4 gap-y-2">
+			<Div class="whitespace-nowrap font-bold">Rows Per Page</Div>
+			<Input bind:value={numberOfRowsPerPage} class="w-[10rem] text-right" type="number" />
+		</Div>
+		<Div class="flex items-center justify-end space-x-2">
+			<Button onclick={settingsModalClose}>Close</Button>
+		</Div>
+	</Div>
 </Modal>
