@@ -311,7 +311,9 @@
 									{:else if column.type === 'DateTime'}
 										<Input
 											bind:value={rowData[columnKey]}
-											class={twMerge('w-[10rem] rounded-none text-right')}
+											class={twMerge(
+												'w-[10rem] rounded-none text-right leading-[calc(1.5em_-_2px)]'
+											)}
 											onblur={() => update(rowData, columnKey)}
 											type="date"
 										/>
@@ -414,10 +416,17 @@
 					/>
 				{:else if column.type === 'Boolean'}
 					<Checkbox bind:checked={createModalData[columnKey]} name={columnKey} />
-				{:else if column.type === 'DateTime'}
+				{:else if column.type === 'Currency'}
 					<Input
 						bind:value={createModalData[columnKey]}
 						class={twMerge('w-[18rem] text-right')}
+						name={columnKey}
+						type="number"
+					/>
+				{:else if column.type === 'DateTime'}
+					<Input
+						bind:value={createModalData[columnKey]}
+						class={twMerge('w-[18rem] text-right leading-[calc(1.5em_-_2px)]')}
 						name={columnKey}
 						type="date"
 					/>
