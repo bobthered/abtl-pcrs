@@ -264,6 +264,12 @@
 											bind:checked={rowData[columnKey]}
 											onchange={() => update(rowData, columnKey)}
 										/>
+									{:else if column.type === 'Currency'}
+										<Input
+											bind:value={rowData[columnKey]}
+											class={twMerge('rounded-none text-right')}
+											onblur={() => update(rowData, columnKey)}
+										/>
 									{:else if column.type === 'DateTime'}
 										<Input
 											bind:value={rowData[columnKey]}

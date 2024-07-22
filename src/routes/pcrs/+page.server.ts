@@ -1,6 +1,10 @@
 import { server } from '$lib/dataTable';
 
 const { actions, load } = await server('PCR', {
+	customFieldTypes: {
+		after: 'Currency',
+		previous: 'Currency'
+	},
 	relations: {
 		jobClassificationId: {
 			modelName: 'JobClassification',

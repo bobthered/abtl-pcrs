@@ -4,6 +4,8 @@ import { DateTime } from 'luxon';
 import format from '$lib/format';
 import { prisma } from '$lib/prisma';
 
+export type CustomFieldType = 'Currency';
+
 export type Fields = {
 	name: string;
 	kind: 'scalar';
@@ -23,30 +25,32 @@ export type Fields = {
 
 export type Options = {
 	beforeCreate?: (data: Record<string, any>) => Record<string, any>;
-	relations?: Record<
-		string,
-		{
-			modelName: string;
-			label: string | ((data: any) => string);
-		}
-	>;
+	customFieldTypes?: Record<string, CustomFieldType>;
+	relations?: Record<string, Relation>;
+};
+
+export type Relation = {
+	modelName: string;
+	label: string | ((data: Record<string, any>) => string);
 };
 
 const server = async (modelName: string, options?: Options) => {
 	options = Object.assign(
-		{ beforeCreate: async (data: Record<string, any>) => data, relations: {} },
+		{
+			beforeCreate: async (data: Record<string, any>) => data,
+			customFieldTypes: {},
+			relations: {}
+		},
 		options
-	);
-
-	const fields = <Fields>(
-		Prisma.dmmf.datamodel.models.find(({ name }) => name === modelName)?.fields
 	);
 
 	const actions = {
 		create: async ({ request }) => {
 			try {
 				const rawData = format.formData.to.object(await request.formData());
-				const data = await options.beforeCreate(await sanitizeDataForDB(rawData));
+				const data = options?.beforeCreate
+					? await options.beforeCreate(await sanitizeDataForDB(rawData))
+					: await sanitizeDataForDB(rawData);
 
 				await prisma[modelName].create({
 					data
@@ -101,6 +105,7 @@ const server = async (modelName: string, options?: Options) => {
 
 	const getRelationOptions = async (options: Options) => {
 		if (options?.relations === undefined) return {};
+
 		const relationOptionArray = await Promise.all(
 			Object.keys(options.relations).map(async (fieldName) => {
 				if (options?.relations === undefined) return [];
@@ -153,8 +158,13 @@ const server = async (modelName: string, options?: Options) => {
 		rows = rows.map((row: Record<string, any>) => {
 			row = Object.keys(row).reduce((obj: Record<string, any>, key: string) => {
 				obj[key] = row[key];
+
 				const field = fields.find(({ name }) => name === key);
 
+				if (field?.type === 'Currency')
+					obj[key] = Intl.NumberFormat('en-us', { currency: 'USD', style: 'currency' }).format(
+						obj[key]
+					);
 				if (field?.type === 'DateTime')
 					obj[key] = DateTime.fromJSDate(obj[key]).toFormat('yyyy-MM-dd');
 
@@ -166,12 +176,13 @@ const server = async (modelName: string, options?: Options) => {
 		return rows;
 	};
 
-	const sanitizeDataForDB = async (rawData: Record<string, any>[]) => {
+	const sanitizeDataForDB = async (rawData: Record<string, any>) => {
 		const data = Object.keys(rawData).reduce((obj: Record<string, any>, key: string) => {
 			obj[key] = rawData[key];
 			const field = fields.find(({ name }) => name === key);
 
 			if (field?.type === 'Boolean') obj[key] = obj[key] === 'true';
+			if (field?.type === 'Currency') obj[key] = parseFloat(obj[key].replace(/[^\.|\d]/gi, ''));
 			if (field?.type === 'DateTime')
 				obj[key] = DateTime.fromFormat(obj[key], 'yyyy-MM-dd').toJSDate();
 			if (field?.type === 'Float') obj[key] = parseFloat(obj[key]);
@@ -182,6 +193,19 @@ const server = async (modelName: string, options?: Options) => {
 
 		return data;
 	};
+
+	const sanitizeFields = (fields: Fields) => {
+		fields = fields.map((field) => {
+			if (options.customFieldTypes?.[field.name]) field.type = options.customFieldTypes[field.name];
+			return field;
+		});
+
+		return fields;
+	};
+
+	const fields = <Fields>(
+		sanitizeFields(Prisma.dmmf.datamodel.models.find(({ name }) => name === modelName)?.fields)
+	);
 
 	return { actions, load };
 };
