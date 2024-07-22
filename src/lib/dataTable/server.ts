@@ -25,7 +25,14 @@ export type Fields = {
 
 export type Options = {
 	beforeCreate?: (data: Record<string, any>) => Record<string, any>;
-	customFieldTypes?: Record<string, CustomFieldType>;
+	customFieldTypes?: Record<
+		string,
+		| CustomFieldType
+		| {
+				sanitizeDataForClient: (value: any) => any;
+				sanitizeDataForDB: (value: any) => any;
+		  }
+	>;
 	relations?: Record<string, Relation>;
 };
 
@@ -168,6 +175,9 @@ const server = async (modelName: string, options?: Options) => {
 				if (field?.type === 'DateTime')
 					obj[key] = DateTime.fromJSDate(obj[key]).toFormat('yyyy-MM-dd');
 
+				if (options.customFieldTypes && field?.type === 'Custom')
+					obj[key] = options.customFieldTypes[field.name].sanitizeDataForClient(obj[key]);
+
 				return obj;
 			}, {});
 			return row;
@@ -188,6 +198,9 @@ const server = async (modelName: string, options?: Options) => {
 			if (field?.type === 'Float') obj[key] = parseFloat(obj[key]);
 			if (field?.type === 'Int') obj[key] = +obj[key];
 
+			if (options.customFieldTypes && field?.type === 'Custom')
+				obj[key] = options.customFieldTypes[field.name].sanitizeDataForDB(obj[key]);
+
 			return obj;
 		}, {});
 
@@ -196,7 +209,14 @@ const server = async (modelName: string, options?: Options) => {
 
 	const sanitizeFields = (fields: Fields) => {
 		fields = fields.map((field) => {
-			if (options.customFieldTypes?.[field.name]) field.type = options.customFieldTypes[field.name];
+			if (typeof options.customFieldTypes?.[field.name] === 'string')
+				field.type = options.customFieldTypes[field.name];
+			if (
+				typeof options.customFieldTypes?.[field.name] === 'object' &&
+				options.customFieldTypes[field.name].sanitizeDataForClient &&
+				options.customFieldTypes[field.name].sanitizeDataForDB
+			)
+				field.type = 'Custom';
 			return field;
 		});
 

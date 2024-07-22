@@ -308,6 +308,12 @@
 											class={twMerge('rounded-none text-right')}
 											onblur={() => update(rowData, columnKey)}
 										/>
+									{:else if column.type === 'Custom'}
+										<Input
+											bind:value={rowData[columnKey]}
+											class={twMerge('rounded-none')}
+											onblur={() => update(rowData, columnKey)}
+										/>
 									{:else if column.type === 'DateTime'}
 										<Input
 											bind:value={rowData[columnKey]}
@@ -422,6 +428,12 @@
 						class={twMerge('w-[18rem] text-right')}
 						name={columnKey}
 						type="number"
+					/>
+				{:else if column.type === 'Custom'}
+					<Input
+						bind:value={createModalData[columnKey]}
+						class={twMerge('w-[18rem]')}
+						name={columnKey}
 					/>
 				{:else if column.type === 'DateTime'}
 					<Input
