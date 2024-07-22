@@ -8,7 +8,7 @@
 	type Props = {
 		children?: Snippet;
 		class?: string;
-		variant: string | string[];
+		variant?: string | string[];
 	};
 
 	// props
