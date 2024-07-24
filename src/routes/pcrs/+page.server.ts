@@ -3,7 +3,13 @@ import { server } from '$lib/dataTable';
 const { actions, load } = await server('PCR', {
 	customFieldTypes: {
 		after: 'Currency',
+		percent: 'Percent',
 		previous: 'Currency'
+	},
+	formulas: {
+		percent: {
+			value: ({ row }) => row.after / row.previous - 1
+		}
 	},
 	relations: {
 		jobClassificationId: {

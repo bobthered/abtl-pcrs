@@ -174,6 +174,14 @@
 						relationOptions[sortKey].find((option) => option.value === b[sortKey])?.label || '';
 					value = aValue.localeCompare(bValue);
 				}
+				if (fields.find((field) => field.name === sortKey)?.type === 'Percent') {
+					const aValue =
+						Math.floor(parseFloat(a[sortKey].replace(/[^\d|\.|-]/g, '')) * 10) / 1000 || 0;
+					const bValue =
+						Math.floor(parseFloat(b[sortKey].replace(/[^\d|\.|-]/g, '')) * 10) / 1000 || 0;
+					console.log(aValue, bValue, a[sortKey], b[sortKey]);
+					value = aValue - bValue;
+				}
 
 				return value * sortDirection;
 			};
@@ -288,31 +296,46 @@
 										<Select
 											bind:value={rowData[columnKey]}
 											class={twMerge('rounded-none')}
-											onchange={() => update(rowData, columnKey)}
+											onchange={() => {
+												if (column?.isReadOnly !== true) update(rowData, columnKey);
+											}}
 											options={relationOptions[columnKey]}
+											readonly={column?.isReadOnly ? 'readonly' : undefined}
 										/>
 									{:else if column.isId}
 										<Input
 											bind:value={rowData[columnKey]}
 											class={twMerge('w-[18rem] rounded-none')}
-											onblur={() => update(rowData, columnKey)}
+											onblur={() => {
+												if (column?.isReadOnly !== true) update(rowData, columnKey);
+											}}
+											readonly={column?.isReadOnly ? 'readonly' : undefined}
 										/>
 									{:else if column.type === 'Boolean'}
 										<Checkbox
 											bind:checked={rowData[columnKey]}
-											onchange={() => update(rowData, columnKey)}
+											onchange={() => {
+												if (column?.isReadOnly !== true) update(rowData, columnKey);
+											}}
+											readonly={column?.isReadOnly ? 'readonly' : undefined}
 										/>
 									{:else if column.type === 'Currency'}
 										<Input
 											bind:value={rowData[columnKey]}
 											class={twMerge('rounded-none text-right')}
-											onblur={() => update(rowData, columnKey)}
+											onblur={() => {
+												if (column?.isReadOnly !== true) update(rowData, columnKey);
+											}}
+											readonly={column?.isReadOnly ? 'readonly' : undefined}
 										/>
 									{:else if column.type === 'Custom'}
 										<Input
 											bind:value={rowData[columnKey]}
 											class={twMerge('rounded-none')}
-											onblur={() => update(rowData, columnKey)}
+											onblur={() => {
+												if (column?.isReadOnly !== true) update(rowData, columnKey);
+											}}
+											readonly={column?.isReadOnly ? 'readonly' : undefined}
 										/>
 									{:else if column.type === 'DateTime'}
 										<Input
@@ -320,28 +343,49 @@
 											class={twMerge(
 												'w-[10rem] rounded-none text-right leading-[calc(1.5em_-_2px)]'
 											)}
-											onblur={() => update(rowData, columnKey)}
+											onblur={() => {
+												if (column?.isReadOnly !== true) update(rowData, columnKey);
+											}}
+											readonly={column?.isReadOnly ? 'readonly' : undefined}
 											type="date"
 										/>
 									{:else if column.type === 'Float'}
 										<Input
 											bind:value={rowData[columnKey]}
 											class={twMerge('w-[10rem] rounded-none text-right')}
-											onblur={() => update(rowData, columnKey)}
+											onblur={() => {
+												if (column?.isReadOnly !== true) update(rowData, columnKey);
+											}}
+											readonly={column?.isReadOnly ? 'readonly' : undefined}
 											type="number"
 										/>
 									{:else if column.type === 'Int'}
 										<Input
 											bind:value={rowData[columnKey]}
 											class={twMerge('w-[10rem] rounded-none text-right')}
-											onblur={() => update(rowData, columnKey)}
+											onblur={() => {
+												if (column?.isReadOnly !== true) update(rowData, columnKey);
+											}}
+											readonly={column?.isReadOnly ? 'readonly' : undefined}
 											type="number"
+										/>
+									{:else if column.type === 'Percent'}
+										<Input
+											bind:value={rowData[columnKey]}
+											class={twMerge('w-[10rem] rounded-none text-right')}
+											onblur={() => {
+												if (column?.isReadOnly !== true) update(rowData, columnKey);
+											}}
+											readonly={column?.isReadOnly ? 'readonly' : undefined}
 										/>
 									{:else if column.type === 'String'}
 										<Input
 											bind:value={rowData[columnKey]}
 											class={twMerge('rounded-none')}
-											onblur={() => update(rowData, columnKey)}
+											onblur={() => {
+												if (column?.isReadOnly !== true) update(rowData, columnKey);
+											}}
+											readonly={column?.isReadOnly ? 'readonly' : undefined}
 										/>
 									{/if}
 								</Td>
@@ -404,64 +448,66 @@
 		use:enhance={createModalEnhanceHandler}
 	>
 		<Div class="grid grid-cols-[fit-content(0px)_1fr] items-center gap-x-4 gap-y-2">
-			{#each columns.filter((columnKey) => !columnsToHide.includes(columnKey)) as columnKey}
+			{#each (columns || []).filter((columnKey) => !(columnsToHide || []).includes(columnKey)) as columnKey}
 				{@const column = fields.find(({ name }) => name === columnKey)}
-				<Div class="font-bold">{columnKey}</Div>
-				{#if relationOptions && relationOptions[columnKey]}
-					<Select
-						bind:value={createModalData[columnKey]}
-						class={twMerge('w-[18rem]')}
-						name={columnKey}
-						options={[{ label: '', value: '' }, ...relationOptions[columnKey]]}
-					/>
-				{:else if column.isId}
-					<Input
-						bind:value={createModalData[columnKey]}
-						class={twMerge('w-[18rem]')}
-						name={columnKey}
-					/>
-				{:else if column.type === 'Boolean'}
-					<Checkbox bind:checked={createModalData[columnKey]} name={columnKey} />
-				{:else if column.type === 'Currency'}
-					<Input
-						bind:value={createModalData[columnKey]}
-						class={twMerge('w-[18rem] text-right')}
-						name={columnKey}
-						type="number"
-					/>
-				{:else if column.type === 'Custom'}
-					<Input
-						bind:value={createModalData[columnKey]}
-						class={twMerge('w-[18rem]')}
-						name={columnKey}
-					/>
-				{:else if column.type === 'DateTime'}
-					<Input
-						bind:value={createModalData[columnKey]}
-						class={twMerge('w-[18rem] text-right leading-[calc(1.5em_-_2px)]')}
-						name={columnKey}
-						type="date"
-					/>
-				{:else if column.type === 'Float'}
-					<Input
-						bind:value={createModalData[columnKey]}
-						class={twMerge('w-[18rem] text-right')}
-						name={columnKey}
-						type="number"
-					/>
-				{:else if column.type === 'Int'}
-					<Input
-						bind:value={createModalData[columnKey]}
-						class={twMerge('w-[18rem] text-right')}
-						name={columnKey}
-						type="number"
-					/>
-				{:else if column.type === 'String'}
-					<Input
-						bind:value={createModalData[columnKey]}
-						class={twMerge('w-[18rem]')}
-						name={columnKey}
-					/>
+				{#if column?.kind !== 'formula'}
+					<Div class="font-bold">{columnKey}</Div>
+					{#if relationOptions && relationOptions[columnKey]}
+						<Select
+							bind:value={createModalData[columnKey]}
+							class={twMerge('w-[18rem]')}
+							name={columnKey}
+							options={[{ label: '', value: '' }, ...relationOptions[columnKey]]}
+						/>
+					{:else if column.isId}
+						<Input
+							bind:value={createModalData[columnKey]}
+							class={twMerge('w-[18rem]')}
+							name={columnKey}
+						/>
+					{:else if column.type === 'Boolean'}
+						<Checkbox bind:checked={createModalData[columnKey]} name={columnKey} />
+					{:else if column.type === 'Currency'}
+						<Input
+							bind:value={createModalData[columnKey]}
+							class={twMerge('w-[18rem] text-right')}
+							name={columnKey}
+							type="number"
+						/>
+					{:else if column.type === 'Custom'}
+						<Input
+							bind:value={createModalData[columnKey]}
+							class={twMerge('w-[18rem]')}
+							name={columnKey}
+						/>
+					{:else if column.type === 'DateTime'}
+						<Input
+							bind:value={createModalData[columnKey]}
+							class={twMerge('w-[18rem] text-right leading-[calc(1.5em_-_2px)]')}
+							name={columnKey}
+							type="date"
+						/>
+					{:else if column.type === 'Float'}
+						<Input
+							bind:value={createModalData[columnKey]}
+							class={twMerge('w-[18rem] text-right')}
+							name={columnKey}
+							type="number"
+						/>
+					{:else if column.type === 'Int'}
+						<Input
+							bind:value={createModalData[columnKey]}
+							class={twMerge('w-[18rem] text-right')}
+							name={columnKey}
+							type="number"
+						/>
+					{:else if column.type === 'String'}
+						<Input
+							bind:value={createModalData[columnKey]}
+							class={twMerge('w-[18rem]')}
+							name={columnKey}
+						/>
+					{/if}
 				{/if}
 			{/each}
 		</Div>

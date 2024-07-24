@@ -9,6 +9,7 @@
 		'date',
 		'previous',
 		'after',
+		'percent',
 		'reasonId',
 		'explanation'
 	]);

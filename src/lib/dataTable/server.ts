@@ -4,11 +4,11 @@ import { DateTime } from 'luxon';
 import format from '$lib/format';
 import { prisma } from '$lib/prisma';
 
-export type CustomFieldType = 'Currency';
+export type CustomFieldType = 'Currency' | 'Percent';
 
-export type Fields = {
+export type Field = {
 	name: string;
-	kind: 'scalar';
+	kind: string;
 	isList: boolean;
 	isRequired: boolean;
 	isUnique: boolean;
@@ -21,7 +21,8 @@ export type Fields = {
 	relationToFields?: string[];
 	isGenerated: boolean;
 	isUpdatedAt: boolean;
-}[];
+};
+export type Fields = Field[];
 
 export type Options = {
 	beforeCreate?: (data: Record<string, any>) => Record<string, any>;
@@ -32,6 +33,13 @@ export type Options = {
 				sanitizeDataForClient: (value: any) => any;
 				sanitizeDataForDB: (value: any) => any;
 		  }
+	>;
+	formulas?: Record<
+		string,
+		{
+			type?: string;
+			value: (data: { row: any; rows: any }) => any;
+		}
 	>;
 	relations?: Record<string, Relation>;
 };
@@ -46,6 +54,7 @@ const server = async (modelName: string, options?: Options) => {
 		{
 			beforeCreate: async (data: Record<string, any>) => data,
 			customFieldTypes: {},
+			formulas: {},
 			relations: {}
 		},
 		options
@@ -163,6 +172,12 @@ const server = async (modelName: string, options?: Options) => {
 
 	const sanitizeDataForClient = async (rows: Record<string, any>[]) => {
 		rows = rows.map((row: Record<string, any>) => {
+			if (options.formulas) {
+				row = Object.keys(options.formulas).reduce((obj: Record<string, any>, key: string) => {
+					if (options.formulas) obj[key] = options.formulas[key].value({ row, rows });
+					return obj;
+				}, row);
+			}
 			row = Object.keys(row).reduce((obj: Record<string, any>, key: string) => {
 				obj[key] = row[key];
 
@@ -174,6 +189,11 @@ const server = async (modelName: string, options?: Options) => {
 					);
 				if (field?.type === 'DateTime')
 					obj[key] = DateTime.fromJSDate(obj[key]).toFormat('yyyy-MM-dd');
+				if (field?.type === 'Percent')
+					obj[key] = Intl.NumberFormat('en-us', {
+						minimumFractionDigits: 1,
+						style: 'percent'
+					}).format(obj[key]);
 
 				if (options.customFieldTypes && field?.type === 'Custom')
 					obj[key] = options.customFieldTypes[field.name].sanitizeDataForClient(obj[key]);
@@ -197,6 +217,8 @@ const server = async (modelName: string, options?: Options) => {
 				obj[key] = DateTime.fromFormat(obj[key], 'yyyy-MM-dd').toJSDate();
 			if (field?.type === 'Float') obj[key] = parseFloat(obj[key]);
 			if (field?.type === 'Int') obj[key] = +obj[key];
+			if (field?.type === 'Percent')
+				obj[key] = Math.floor(parseFloat(obj[key].replace(/[^\d|\.|-]/g, '')) * 10) / 1000;
 
 			if (options.customFieldTypes && field?.type === 'Custom')
 				obj[key] = options.customFieldTypes[field.name].sanitizeDataForDB(obj[key]);
@@ -208,6 +230,27 @@ const server = async (modelName: string, options?: Options) => {
 	};
 
 	const sanitizeFields = (fields: Fields) => {
+		if (options.formulas) {
+			fields = Object.keys(options.formulas).reduce((arr: Fields, key: string) => {
+				if (options.formulas) {
+					const defaults: Field = {
+						name: key,
+						kind: 'formula',
+						isList: false,
+						isRequired: false,
+						isUnique: false,
+						isId: false,
+						isReadOnly: true,
+						hasDefaultValue: false,
+						type: 'String',
+						isGenerated: false,
+						isUpdatedAt: false
+					};
+					arr.push(Object.assign(defaults, { type: options.formulas[key].type || 'String' }));
+				}
+				return arr;
+			}, fields);
+		}
 		fields = fields.map((field) => {
 			if (typeof options.customFieldTypes?.[field.name] === 'string')
 				field.type = options.customFieldTypes[field.name];
