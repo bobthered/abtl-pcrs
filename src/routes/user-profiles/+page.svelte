@@ -3,7 +3,7 @@
 
 	// props
 	let { data } = $props();
-	let columnOrder = $state(['firstName', 'lastName']);
+	let columnOrder = $state(['firstName', 'lastName', 'dateHired', 'service']);
 	let columnsToHide = $state(['id', 'user']);
 	let sortDirection: -1 | 1 = $state(1);
 	let sortKey = $state('firstName');
