@@ -3,6 +3,9 @@ import { DateTime } from 'luxon';
 
 const { actions, load } = await server('UserProfile', {
 	// beforeCreate: () => {},
+	customFieldTypes: {
+		service: 'Int'
+	},
 	formulas: {
 		service: {
 			value: ({ row }) => {
