@@ -297,7 +297,7 @@
 											bind:value={rowData[columnKey]}
 											class={twMerge('rounded-none')}
 											onchange={() => {
-												if (column?.isReadOnly !== true) update(rowData, columnKey);
+												if (column?.kind !== 'formula') update(rowData, columnKey);
 											}}
 											options={relationOptions[columnKey]}
 											readonly={column?.isReadOnly ? 'readonly' : undefined}
@@ -307,7 +307,7 @@
 											bind:value={rowData[columnKey]}
 											class={twMerge('w-[18rem] rounded-none')}
 											onblur={() => {
-												if (column?.isReadOnly !== true) update(rowData, columnKey);
+												if (column?.kind !== 'formula') update(rowData, columnKey);
 											}}
 											readonly={column?.isReadOnly ? 'readonly' : undefined}
 										/>
@@ -315,7 +315,7 @@
 										<Checkbox
 											bind:checked={rowData[columnKey]}
 											onchange={() => {
-												if (column?.isReadOnly !== true) update(rowData, columnKey);
+												if (column?.kind !== 'formula') update(rowData, columnKey);
 											}}
 											readonly={column?.isReadOnly ? 'readonly' : undefined}
 										/>
@@ -324,7 +324,7 @@
 											bind:value={rowData[columnKey]}
 											class={twMerge('rounded-none text-right')}
 											onblur={() => {
-												if (column?.isReadOnly !== true) update(rowData, columnKey);
+												if (column?.kind !== 'formula') update(rowData, columnKey);
 											}}
 											readonly={column?.isReadOnly ? 'readonly' : undefined}
 										/>
@@ -333,7 +333,7 @@
 											bind:value={rowData[columnKey]}
 											class={twMerge('rounded-none')}
 											onblur={() => {
-												if (column?.isReadOnly !== true) update(rowData, columnKey);
+												if (column?.kind !== 'formula') update(rowData, columnKey);
 											}}
 											readonly={column?.isReadOnly ? 'readonly' : undefined}
 										/>
@@ -344,7 +344,7 @@
 												'w-[10rem] rounded-none text-right leading-[calc(1.5em_-_2px)]'
 											)}
 											onblur={() => {
-												if (column?.isReadOnly !== true) update(rowData, columnKey);
+												if (column?.kind !== 'formula') update(rowData, columnKey);
 											}}
 											readonly={column?.isReadOnly ? 'readonly' : undefined}
 											type="date"
@@ -354,7 +354,7 @@
 											bind:value={rowData[columnKey]}
 											class={twMerge('w-[10rem] rounded-none text-right')}
 											onblur={() => {
-												if (column?.isReadOnly !== true) update(rowData, columnKey);
+												if (column?.kind !== 'formula') update(rowData, columnKey);
 											}}
 											readonly={column?.isReadOnly ? 'readonly' : undefined}
 											type="number"
@@ -364,7 +364,7 @@
 											bind:value={rowData[columnKey]}
 											class={twMerge('w-[10rem] rounded-none text-right')}
 											onblur={() => {
-												if (column?.isReadOnly !== true) update(rowData, columnKey);
+												if (column?.kind !== 'formula') update(rowData, columnKey);
 											}}
 											readonly={column?.isReadOnly ? 'readonly' : undefined}
 											type="number"
@@ -374,7 +374,7 @@
 											bind:value={rowData[columnKey]}
 											class={twMerge('w-[10rem] rounded-none text-right')}
 											onblur={() => {
-												if (column?.isReadOnly !== true) update(rowData, columnKey);
+												if (column?.kind !== 'formula') update(rowData, columnKey);
 											}}
 											readonly={column?.isReadOnly ? 'readonly' : undefined}
 										/>
@@ -383,7 +383,7 @@
 											bind:value={rowData[columnKey]}
 											class={twMerge('rounded-none')}
 											onblur={() => {
-												if (column?.isReadOnly !== true) update(rowData, columnKey);
+												if (column?.kind !== 'formula') update(rowData, columnKey);
 											}}
 											readonly={column?.isReadOnly ? 'readonly' : undefined}
 										/>
