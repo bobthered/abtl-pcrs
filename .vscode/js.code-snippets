@@ -8,7 +8,12 @@
 		"body": [
 			"import { server } from '\\$lib/dataTable';",
 			"",
-			"const { actions, load } = await server('$1');",
+			"const { actions, load } = await server('$1', {",
+			"\t// beforeCreate: () => {},",
+			"\t// customFieldTypes: {},",
+			"\t// formulas: {},",
+			"\t// relations: {},",
+			"});",
 			"",
 			"export { actions, load };"
 		]
