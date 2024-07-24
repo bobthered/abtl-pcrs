@@ -9,7 +9,8 @@
 		['/job-classifications', 'Job Classifications'],
 		['/pcrs', 'PCRs'],
 		['/pcr-reasons', 'PCR Reasons'],
-		['/users', 'Users']
+		['/users', 'Users'],
+		['/user-profiles', 'User Profiles']
 	]);
 </script>
 
