@@ -228,7 +228,7 @@
 					{@render header()}
 				{:else}
 					<Th />
-					{#each columns?.filter((columnKey) => !columnsToHide.includes(columnKey)) as columnKey}
+					{#each (columns || [])?.filter((columnKey) => !(columnsToHide || []).includes(columnKey)) as columnKey}
 						{@const column = fields.find(({ name }) => name === columnKey)}
 						<Th class="p-0">
 							{#if isSortable}
@@ -241,7 +241,7 @@
 									variant={['ghost']}
 								>
 									<span>
-										{columnKey}
+										{(columnKey[0].toUpperCase() + columnKey.slice(1)).replace(/([A-Z])/g, ' $1')}
 									</span>
 
 									<Div
@@ -260,7 +260,7 @@
 								</Button>
 							{:else}
 								<Div class="px-6 py-3">
-									{columnKey}
+									{(columnKey[0].toUpperCase() + columnKey.slice(1)).replace(/([A-Z])/g, ' $1')}
 								</Div>
 							{/if}
 						</Th>
